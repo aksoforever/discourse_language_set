@@ -1,10 +1,21 @@
-.set_ul {
-	position: absolute;
-    top: 40px;
-    min-width: 50px;
-}
-.set_span {
-	float: right;
-    padding-right: 10px;
+.language-switcher-menu {
+   .menu-panel{
+	max-width: 130px!important;
+     }
+  ul {
+    list-style: none;
+    margin: 0;
+    columns: 1;
+    -webkit-columns: 1;
+    -moz-columns: 1;
+
+    li {
+      margin: 5px 0;
+      display: inline-block;
+      width: 100%;
+      text-align:left;
+
+    }
+  }
 }
 
