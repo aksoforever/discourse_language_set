@@ -1,20 +1,18 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
 import { h } from "virtual-dom";
 import { ajax } from "discourse/lib/ajax";
+import {iconNode} from "discourse-common/lib/icon-library"
 function initialize(api) {
+
   const allow_user_locale = Discourse.SiteSettings.allow_user_locale;
   const currentUser = api.getCurrentUser();
-  if(!allow_user_locale || !currentUser) return;
-    
-  
+  const site = api.container.lookup("site:main");
+  if(!allow_user_locale || !currentUser || site.mobileView) return;
   var username = currentUser.get("username");
-
   api.createWidget("lang-list", {
-    tagName: 'li.lang_list',
-    
-
+    tagName: 'li',
     html(attrs){
-      return h("li",{className:"set_li select-kit-row",lang:attrs.value},attrs.name);
+      return h("a",{className:"widget-link",lang:attrs.value},attrs.name);
     },
     click(event){
        ajax("/u/" + username + ".json", {
@@ -33,50 +31,40 @@ function initialize(api) {
             })
             .finally(() => {});
     }
-
   })
-
   api.createWidget("lang-default", {
-    tagName: 'div.lang_default',
-    
+    tagName: 'span',
+
     html(attrs,state){
-      return h("span.set_span","中文");
+      return h("a.icon",iconNode('globe'));
     },
     click(e){
       console.log(this.attrs)
       if(!this.attrs.langListVisible){
         this.sendWidgetAction("toggleLangList");
       }
-      
     }
-
   })
+  api.createWidget("language-switcher-menu", {
+    tagName: 'div.language-switcher-menu',
 
-  api.createWidget("lang-list-div", {
-    tagName: 'div.lang_list_div',
-    
     html(attrs, state){
       var html = []
       const langs = JSON.parse(Discourse.SiteSettings.available_locales)
       langs.map(v =>{
         var item = this.attach('lang-list',v);
-        html.push(item) 
+        html.push(item)
       })
-      return h("ul.select-kit-collection.set_ul.menu-panel",html);
-   
-    },
+      return h("ul.menu-panel",html);
 
+    },
     clickOutside(e) {
         this.sendWidgetAction("toggleLangList");
     },
-    
-
   })
-
   api.createWidget("lang-set", {
-    tagName: 'div.lang_set',
+    tagName: 'li.header-dropdown-toggle',
     buildKey: () => `lang_set`,
-
     defaultState() {
       let states = {
         langListVisible: false
@@ -90,23 +78,17 @@ function initialize(api) {
       this.state.langListVisible = !this.state.langListVisible;
       console.log("toggleLangList 后 " +this.state.langListVisible)
     },
-
-    
     html(attrs, state){
-
       console.log("html " +this.state.langListVisible)
       const panels = [this.attach('lang-default',{langListVisible:state.langListVisible})];
       if(state.langListVisible){
       panels.push(
-        this.attach('lang-list-div',{langListVisible:state.langListVisible})
+        this.attach('language-switcher-menu',{langListVisible:state.langListVisible})
       )}
-
-      return h("div.select-kit.combo-box.set_div",panels);
+      return panels;
     },
-
   })
-
-  api.decorateWidget("header-buttons:before", helper => {
+  api.decorateWidget("header-icons:before", helper => {
     return helper.attach("lang-set");
   });
 }
