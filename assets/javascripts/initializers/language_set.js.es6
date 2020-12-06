@@ -8,6 +8,7 @@ function initialize(api) {
   const currentUser = api.getCurrentUser();
   const site = api.container.lookup("site:main");
   if(!allow_user_locale || !currentUser || site.mobileView) return;
+
   var username = currentUser.get("username");
   api.createWidget("lang-list", {
     tagName: 'li',
@@ -24,12 +25,8 @@ function initialize(api) {
             .then((result) => {
               window.location.reload()
             })
-            .catch(error => {
-              if (error) {
-              console.log(error)
-              }
-            })
-            .finally(() => {});
+            location.reload();
+            return false;
     }
   })
   api.createWidget("lang-default", {
