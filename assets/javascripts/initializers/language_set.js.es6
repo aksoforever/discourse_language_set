@@ -33,7 +33,7 @@ function initialize(api) {
     tagName: 'span',
 
     html(attrs,state){
-      return h("a.icon",iconNode('globe'));
+      return h("a.icon",iconNode('language'));
     },
     click(e){
       console.log(this.attrs)
